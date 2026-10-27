@@ -1,0 +1,15 @@
+[project]
+name = "snow-screensaver"
+version = "1.0.0"
+description = "Lightweight Windows snow-falling screensaver with right-click live settings"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "pillow>=12.2.0",
+    "screeninfo>=0.8.1",
+]
+
+[dependency-groups]
+dev = [
+    "pyinstaller>=6.20.0",
+]
