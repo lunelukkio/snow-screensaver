@@ -9,6 +9,9 @@ wheels/
 # Virtual environments
 .venv
 
+# Rust build output
+target/
+
 # Local AI settings and personal app preferences
 .claude/
 config.json
