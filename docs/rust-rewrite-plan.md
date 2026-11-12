@@ -1,6 +1,6 @@
 # Rust + Direct3D 11 への書き直し計画（resource消費の最小化）
 
-- 状態: Rust版を実装済み。依頼者の確認待ち（Python版は未削除。結果は14章）。作成日 2026-11-13
+- 状態: 実装済み。依頼者の確認済み（2026-11-13）。Python版は削除し、README.mdとCLAUDE.mdを更新済み（結果は14章、受け入れは15章）。作成日 2026-11-13
 - 計画時のmodel / effort: Fable 5.2 / max。usage上限の残量はruntimeから取得できず、判定不能。
 - 関連Issue: #1
 
@@ -158,13 +158,14 @@ AIが確認する:
 
 ```powershell
 cargo test
-cargo clippy -- -D warnings
+cargo clippy --all-targets -- -D warnings
 cargo fmt --check
 ./build.ps1
-uv run --no-project python tools/measure.py dist/snow.exe
+uv run --no-project python tools/measure.py bench dist/snow.exe
+uv run --no-project python tools/measure.py smoke dist/snow.exe
 ```
 
-`tools/measure.py`は対象を起動し、process CPU、`dwm.exe`のCPU、processごとのGPU使用率とGPU memory、working setを計測して終了させる。
+`tools/measure.py`は対象を一時folderから起動して終了させる。`bench`はprocess CPU、`dwm.exe`のCPU、processごとのGPU使用率とGPU memory、working set、実測fpsを計測する。`smoke`は全monitorへの表示、menu操作と保存、lockでの停止と再開、display変更後の作り直し、double-clickでの終了を確認する。
 
 ## 10. 統合と承認範囲
 
@@ -231,5 +232,15 @@ uv run --no-project python tools/measure.py dist/snow.exe
 - `dwm.exe`の増分がfpsに比例しなくなり、ばらつき（約±0.3）の範囲に収まった。Independent Flipが成立している可能性が高い。PresentMonでの直接確認はしていない
 - そのぶん表示の処理がprocess側に計上され、processのGPU使用率（0.33%）とVRAM（35 MB）は試作より大きい。`dwm.exe`のGPU使用率は約1%から0.05%へ減った
 - 解像度100%ではGPU使用率が約6倍になる。既定の50%は妥当
+
+## 15. 受け入れ（2026-11-13）
+
+依頼者が`dist\snow.exe`を実際に使って確認し、見た目と動き、右クリックmenuと色選択dialog、double-clickでの終了に問題がないとした。これを受けて次を行った。
+
+- Python実装（`main.py`、`snow/`、`installer/build_exe.py`、`pyproject.toml`、`uv.lock`、`.python-version`）をGitから削除した。履歴から復元できる
+- `README.md`と`CLAUDE.md`をRust版の内容に書き換えた
+- `installer/make_icon.py`の使用例を、`pyproject.toml`の削除に合わせて`uv run --no-project --with pillow ...`へ変えた。実行はしていない（実行すると`installer/snow.ico`を上書きする）
+
+未確認のまま残る点（11章）: Independent Flipの直接確認（PresentMon）、displayの電源off中のCPU使用（確認したのはlock中のみ）、実際のdriver reset。
 
 残っている確認は8章の「依頼者が確認する」項目。

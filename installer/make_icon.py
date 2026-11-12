@@ -1,6 +1,6 @@
 """Generate installer/snow.ico — a soft-edged snow icon.
 
-Run with:  uv run python installer/make_icon.py
+Run with:  uv run --no-project --with pillow python installer/make_icon.py
 """
 from __future__ import annotations
 
